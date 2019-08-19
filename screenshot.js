@@ -11,11 +11,11 @@ async function main() {
     args: [
       '--no-sandbox', 
       '--start-maximized', 
-      '--user-data-dir=$HOME/.config/google-chrome/',
+      //'--user-data-dir=$HOME/.config/google-chrome/',
       '--remote-debugging-port=9223'
     ],
-    executablePath:"/opt/google/chrome/google-chrome",
-    userDataDir: "/home/rmasyagin/.config/google-chrome/"
+    //executablePath:"/opt/google/chrome/google-chrome",
+    //userDataDir: "/home/rmasyagin/.config/google-chrome/"
   });
   // [END gae_std_headless_chrome_full_sample_browser]
 
