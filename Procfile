@@ -1,0 +1,1 @@
+web: npm screenshot && npm pdf
