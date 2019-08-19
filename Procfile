@@ -1,2 +1,1 @@
-web: npm start
-web: npm run pdf
+web: export PORT=$PORT; npm start
