@@ -1,1 +1,2 @@
-web: npm run screenshot && npm run pdf
+web: npm start
+web: npm run pdf
