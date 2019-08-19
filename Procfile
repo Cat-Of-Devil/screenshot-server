@@ -1,1 +1,1 @@
-web: npm screenshot && npm pdf
+web: npm run screenshot && npm run pdf
