@@ -10,9 +10,9 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node screenshot.js",
-    "screenshot": "export PORT=7777; node screenshot.js",
-    "pdf": "export PORT=8888; node pdf.js",
+    "start": "node app.js",
+    "screenshot": "node screenshot.js",
+    "pdf": "node pdf.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {

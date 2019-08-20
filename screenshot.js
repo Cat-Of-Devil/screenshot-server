@@ -10,7 +10,9 @@ async function main() {
   const browser = await puppeteer.launch({
     args: [
       '--no-sandbox', 
+      '--disable-gpu',
       '--start-maximized', 
+      '--disable-setuid-sandbox',
       //'--user-data-dir=$HOME/.config/google-chrome/',
       '--remote-debugging-port=9223'
     ],
