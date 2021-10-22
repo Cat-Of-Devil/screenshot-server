@@ -1,24 +1,47 @@
 'use strict';
 
-// [START gae_std_headless_chrome_full_sample]
+const process = require('process');
+
+process.on('beforeExit', (code) => {
+  console.log('Process beforeExit event with code: ', code);
+});
+
+process.on('exit', (code) => {
+  console.log('Process exit event with code: ', code);
+});
+
+// const { cpuUsage, memoryUsage } = process;
+// console.log('cpuUsage', cpuUsage());
+// console.log('memoryUsage', memoryUsage());
+
 const express = require('express');
-const puppeteer = require('puppeteer');
+// const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
+const { launchBrowser, closeBrowser, blockDomains } = require('./helpers/browser');
+
+const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
+puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
+
 const app = express();
 
-async function main() {
-  // [START gae_std_headless_chrome_full_sample_browser]
-  const browser = await puppeteer.launch({
-    args: [
-      '--no-sandbox', 
-      '--disable-gpu',
-      '--start-maximized', 
-      '--disable-setuid-sandbox',
-      '--remote-debugging-port=9223'
-    ],
-  });
+const DELAY_BEFORE_CLOSE = 60000;
 
+let _timer = null;
+
+const resetTimer = (delay = DELAY_BEFORE_CLOSE) => {
+  if (_timer) clearTimeout(_timer);
+  console.log('Timer reset!');
+
+  _timer = setTimeout(() => {
+    closeBrowser();
+    _timer = null;
+    console.log('Browser closed!');
+  }, delay)
+}
+
+async function main() {
   app.get('/', async (req, res) => {
-    const {url} = req.query;
+    const { url, format } = req.query;
 
     if (!url) {
       return res.send(`
@@ -27,13 +50,20 @@ async function main() {
       `);
     }
 
+    console.log('url: ', url);
+
+    resetTimer();
+
+    const browser = await launchBrowser(puppeteer);
     const page = await browser.newPage();
-    await page.goto(url);
-
     page.setViewport({width:1920, height:1080});
+   
+    await page.goto(url);
     const imageBuffer = await page.screenshot({fullPage: true});
-
-    res.set('Content-Type', 'image/png');
+    const type = format && ['png', 'jpg'].indexOf(format) !== -1 ? format : 'png';
+    await page.close();
+    
+    res.set('Content-Type', `image/${type}`);
     res.send(imageBuffer);
   });
 
@@ -47,7 +77,11 @@ async function main() {
       `);
     }
 
+    resetTimer();
+
+    const browser = await launchBrowser(puppeteer);
     const page = await browser.newPage();
+    
     await page.goto(url);
     await page.emulateMedia('screen');
     page.setViewport({width:1920, height:1080});
@@ -56,7 +90,7 @@ async function main() {
       printBackground: true,
       // width:1920,
       // height:1080,
-      //format: 'A4',
+      // format: 'A4',
       // format: 'Letter', 
       // PreferCSSPageSize: true 
     };
@@ -67,6 +101,7 @@ async function main() {
     }
 
     const pdfBuffer = await page.pdf(pdfOptions);
+    page.close();
 
     let hostName = url.replace(/(https?:\/\/(?:www\.)?([^\/]*)\/.*$)/,'$2');
 
@@ -82,7 +117,6 @@ async function main() {
     const {port} = server.address();
     console.info(`App listening on port ${port}`);
   });
-  // [END gae_std_headless_chrome_full_sample]
 }
 
 main();

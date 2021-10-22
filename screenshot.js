@@ -1,28 +1,16 @@
 'use strict';
 
-// [START gae_std_headless_chrome_full_sample]
 const express = require('express');
 const puppeteer = require('puppeteer');
+const { launchBrowser } = require('./helpers/browser');
+
 const app = express();
 
 async function main() {
-  // [START gae_std_headless_chrome_full_sample_browser]
-  const browser = await puppeteer.launch({
-    args: [
-      '--no-sandbox', 
-      '--disable-gpu',
-      '--start-maximized', 
-      '--disable-setuid-sandbox',
-      //'--user-data-dir=$HOME/.config/google-chrome/',
-      '--remote-debugging-port=9223'
-    ],
-    //executablePath:"/opt/google/chrome/google-chrome",
-    //userDataDir: "/home/rmasyagin/.config/google-chrome/"
-  });
-  // [END gae_std_headless_chrome_full_sample_browser]
+  const browser = await launchBrowser(puppeteer);
 
   app.use(async (req, res) => {
-    const {url} = req.query;
+    const { url, format } = req.query;
 
     if (!url) {
       return res.send(`
@@ -36,8 +24,9 @@ async function main() {
 
     page.setViewport({width:1920, height:1080});
     const imageBuffer = await page.screenshot({fullPage: true});
+    const type = format && ['png', 'jpg'].indexOf(format) !== -1 ? format : 'png';
 
-    res.set('Content-Type', 'image/png');
+    res.set('Content-Type', `image/${type}`);
     res.send(imageBuffer);
   });
 
@@ -48,7 +37,6 @@ async function main() {
     const {port} = server.address();
     console.info(`App listening on port ${port}`);
   });
-  // [END gae_std_headless_chrome_full_sample]
 }
 
 main();

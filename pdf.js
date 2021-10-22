@@ -3,23 +3,11 @@
 // [START gae_std_headless_chrome_full_sample]
 const express = require('express');
 const puppeteer = require('puppeteer');
+const { launchBrowser } = require('./helpers/browser');
 const app = express();
 
 async function main() {
-  // [START gae_std_headless_chrome_full_sample_browser]
-  const browser = await puppeteer.launch({
-    args: [
-      '--no-sandbox', 
-      '--disable-gpu',
-      '--start-maximized', 
-      '--disable-setuid-sandbox',
-      //'--user-data-dir=$HOME/.config/google-chrome/',
-      '--remote-debugging-port=9224',
-    ],
-    //executablePath:"/opt/google/chrome/google-chrome",
-    //userDataDir: "/home/rmasyagin/.config/google-chrome/"
-  });
-  // [END gae_std_headless_chrome_full_sample_browser]
+  const browser = await launchBrowser(puppeteer);
 
   app.use(async (req, res) => {
     const {url, fullpage} = req.query;
@@ -66,7 +54,6 @@ async function main() {
     const {port} = server.address();
     console.info(`App listening on port ${port}`);
   });
-  // [END gae_std_headless_chrome_full_sample]
 }
 
 main();
