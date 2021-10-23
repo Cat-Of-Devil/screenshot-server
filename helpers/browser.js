@@ -57,7 +57,27 @@ const defaultConfig = {
   //userDataDir: "/home/rmasyagin/.config/google-chrome/"
 }
 
-const launchBrowser = async (puppeteer, config = defaultConfig) => {
+const DELAY_BEFORE_CLOSE = 60000;
+
+let _timer = null;
+
+const resetBrowserCloseTimer = (delay = DELAY_BEFORE_CLOSE) => {
+  if (_timer) clearTimeout(_timer);
+  _timer = setTimeout(() => {
+    closeBrowser();
+    _timer = null;
+  }, delay)
+}
+
+const launchBrowser = async (
+  puppeteer,
+  config = defaultConfig,
+  autoClose = true,
+  delayBeforeClose = DELAY_BEFORE_CLOSE
+) => {
+  if (autoClose) {
+    resetBrowserCloseTimer(delayBeforeClose);
+  }
   if (!_browser) {
     _browser = await puppeteer.launch(config);
   }

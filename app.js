@@ -17,27 +17,12 @@ process.on('exit', (code) => {
 const express = require('express');
 // const puppeteer = require('puppeteer');
 const puppeteer = require('puppeteer-extra');
-const { launchBrowser, closeBrowser, blockDomains } = require('./helpers/browser');
+const { launchBrowser, blockDomains } = require('./helpers/browser');
 
 const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
 puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
 
 const app = express();
-
-const DELAY_BEFORE_CLOSE = 60000;
-
-let _timer = null;
-
-const resetTimer = (delay = DELAY_BEFORE_CLOSE) => {
-  if (_timer) clearTimeout(_timer);
-  console.log('Timer reset!');
-
-  _timer = setTimeout(() => {
-    closeBrowser();
-    _timer = null;
-    console.log('Browser closed!');
-  }, delay)
-}
 
 async function main() {
   app.get('/', async (req, res) => {
@@ -51,8 +36,6 @@ async function main() {
     }
 
     console.log('url: ', url);
-
-    resetTimer();
 
     const browser = await launchBrowser(puppeteer);
     const page = await browser.newPage();
@@ -76,8 +59,6 @@ async function main() {
         <p></p>Bookmarklet: <a href="javascript:open('http://localhost:8888?url='+location.href)">Pdf</a></p>
       `);
     }
-
-    resetTimer();
 
     const browser = await launchBrowser(puppeteer);
     const page = await browser.newPage();
