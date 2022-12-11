@@ -4,7 +4,7 @@
   "description": "Server designed to create screenshots of sites.",
   "main": "screenshot.js",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "puppeteer": "^10.4.0",
     "puppeteer-extra": "^3.2.3",
     "puppeteer-extra-plugin-adblocker": "^2.12.0"
